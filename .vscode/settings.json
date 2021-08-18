@@ -1,0 +1,8 @@
+{
+    "kickass-studio.kickAssJar": "E:\\c64_2021\\ka",
+    "kickass-studio.viceBin": "E:\\c64_2021\\GTK3VICE-3.5-win64-r40383\\bin\\x64sc.exe",
+    "kickass-c64.c64DebuggerBin": "E:\\c64_2021\\C64Debugger/C64Debugger.exe",
+    "kickass-c64.kickAssJar": "E:\\c64_2021\\ka/KickAss.jar",
+    "kickass-c64.viceBin": "E:\\c64_2021\\GTK3VICE-3.5-win64-r40383\\bin\\x64.exe",
+    "kickass-c64.useC64Debugger": false
+}
