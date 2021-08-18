@@ -8,7 +8,7 @@ my: *=$1000 "main"
 #import "keyboard.asm"
 #import "joystick.asm"
 #import "io.asm"
-
+#import "audio.asm"
 
 trust: .byte 1
 maxTrust: .byte 5
@@ -108,11 +108,11 @@ checkJump:
 	// already jumping
 	lda #1
 	cmp spaceIsJump
-	beq end
+	beq endj
 
 	lda joy_jump
 	cmp #1
-	bne end
+	bne endj
 
 	// set going up for now
 	lda #1
@@ -130,9 +130,9 @@ checkJump:
 
 	lda #-1
 	sta spaceJumpdY
-	jmp end
+	jmp endj
 nojump:
-end:
+endj:
     rts
 
 checkFire:
@@ -153,11 +153,12 @@ checkFire:
 	biteq(spacescraft_sprite, sprite_bit9_adr, endf)
 	// set the bit9 for the fire_sprite too
 	setbit(fire_sprite, sprite_bit9_adr)
+	jsr playit
 endf:
     rts
 
 endFire:
-	// if fire is already activated, exit
+	// if fire not activated, exit
 	cmpne(1, fireIsActivate, end2)
 	// dec fireSpan, if not 0, check edge
 	dec fireSpan
@@ -166,6 +167,10 @@ endFire:
 	clearbit(fire_sprite, sprite_enable_adr)
 	// desactivate fire
 	stored(0, fireIsActivate)
+
+	// stop play note
+	lda #32
+	sta $d404
 	jmp end2
 
 stopEdge:
@@ -177,10 +182,11 @@ stopEdge:
 
 	// hide fire, because it just pass throught the right of the screen
 	clearbit(fire_sprite, sprite_enable_adr)
-
 	// desactivate fire
 	stored(0, fireIsActivate)
-	jmp end2
+	// stop play note
+	lda #32
+	sta $d404
 end2:
 	rts
 	
@@ -233,7 +239,6 @@ end3:
 setSpaceVelocity:
 	lda trust
 	sta spaceVelocityX
-	lda #1
 	sta spaceVelocityY
 	rts
 
