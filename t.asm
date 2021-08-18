@@ -2,6 +2,7 @@ BasicUpstart2(mainProg)
 
 my: *=$1000 "main"
 
+#import "utils.asm"
 #import "constant.asm"
 #import "irq.asm"
 #import "keyboard.asm"
@@ -135,72 +136,52 @@ end:
     rts
 
 checkFire:
-    // is already active go end
-	lda #1
-	cmp fireIsActivate
-	beq endf
-
-	// if fire pressed
-	lda #1
-	cmp joy_fire
-	bne endf
-
+    // is already active, exit
+	cmpeq(1, fireIsActivate, endf)
+	// if not fire pressed, exit
+	cmpne(1, joy_fire, endf)
 	// fire is pressed, activate fire
-	lda #1
-	sta fireIsActivate
-	lda fireSpanMax
-	sta fireSpan
-	//; enable sprite fire
-    lda #2
-    ora $d015
-	sta $d015
-
-	//; set x and y position from player
-    lda $d000
-    sta $d002
-	lda $d001
-    sta $d003
-
-	lda $d010 // check if bit 9 is on for the player
-	and #1
-	beq endf
-
-	lda #2   // yes, set bit 9 on for fire
-	ora $d010
-	sta $d010
+	stored(1, fireIsActivate)
+	// set the max for fire spkab
+	store(fireSpanMax, fireSpan)
+	// enable sprite fire
+	setbit(fire_sprite, sprite_enable_adr)
+	// set x and y of fire from spacecraft position
+	store(spacescraft_x_adr, fire_x_adr)
+	store(spacescraft_y_adr, fire_y_adr)
+	// if bit9 not set, exit
+	andeq(0, sprite_bit9_adr, endf)
+	// set the bit9 for the fire_sprite too
+	setbit(fire_sprite, sprite_bit9_adr)
 endf:
     rts
 
 endFire:
-	lda #1
-	cmp fireIsActivate
-	bne end2
-
+	// if fire is already activated, exit
+	cmpne(1, fireIsActivate, end2)
+	// dec fireSpan, if not 0, check edge
 	dec fireSpan
 	bne stopEdge
-
-	// hide fire
-    lda #253
-    and $d015
-	sta $d015
-	lda #0
-	sta fireIsActivate
+	// hide fire, because fireSpan == 0
+	clearbit(fire_sprite, sprite_enable_adr)
+	// desactivate fire
+	stored(0, fireIsActivate)
 	jmp end2
 
 stopEdge:
-	lda #2 
-	and $d010
-	bne end2
+	// if bit9 not set, exit we are not near right 
+	andne(fire_sprite, sprite_bit9_adr, end2)
 	
+	// if fire > 2 ok
 	lda #2
-	cmp $d002
+	cmp fire_x_adr
 	bcc end2
-	// hide fire
-    lda #253
-    and $d015
-	sta $d015
-	lda #0
-	sta fireIsActivate
+
+	// hide fire, because it just pass throught the right of the screen
+	clearbit(fire_sprite, sprite_enable_adr)
+
+	// desactivate fire
+	stored(0, fireIsActivate)
 	jmp end2
 end2:
 	rts
@@ -321,7 +302,7 @@ end5:
 mainProg: 	{
 	clearscreen(3)
 	// share color 1
-	lda #3
+	lda CYAN
 	sta $d025
 
 	//share color 2

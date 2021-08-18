@@ -1,3 +1,15 @@
+.const spacescraft_sprite = 0
+.const fire_sprite = 1
+
+.const spacescraft_x_adr = $d000
+.const spacescraft_y_adr = $d001
+
+.const fire_x_adr = $d002
+.const fire_y_adr = $d003
+
+.const sprite_enable_adr = $d015
+.const sprite_bit9_adr = $d010
+
 .const screen = $0400
 .const CHROUT= $FFD2
 .const CHRIN = $FFCF
