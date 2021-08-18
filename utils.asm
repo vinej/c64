@@ -48,3 +48,29 @@ maskClearBit:  .byte %11111110, %11111101, %11111011, %11110111, %11101111, %110
     and adr
     bne dest
 }
+
+.macro biteq(value, adr, dest) {
+    ldx #value
+    lda maskSetBit,x
+    bit adr
+    beq dest
+}
+
+.macro bitne(value, adr, dest) {
+    ldx #value
+    lda maskSetBit,x
+    bit adr
+    bne dest
+}
+
+.macro jmpgt(adr, value, dest) {
+	lda #value
+	cmp adr
+	bcc dest
+}
+
+.macro jmplte(adr, value, dest) {
+	lda #value
+	cmp adr
+	bcs dest
+}

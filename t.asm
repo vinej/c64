@@ -149,8 +149,8 @@ checkFire:
 	// set x and y of fire from spacecraft position
 	store(spacescraft_x_adr, fire_x_adr)
 	store(spacescraft_y_adr, fire_y_adr)
-	// if bit9 not set, exit
-	andeq(0, sprite_bit9_adr, endf)
+	// if bit9 of spacescaft not set, exit
+	biteq(spacescraft_sprite, sprite_bit9_adr, endf)
 	// set the bit9 for the fire_sprite too
 	setbit(fire_sprite, sprite_bit9_adr)
 endf:
@@ -170,12 +170,10 @@ endFire:
 
 stopEdge:
 	// if bit9 not set, exit we are not near right 
-	andne(fire_sprite, sprite_bit9_adr, end2)
+	bitne(fire_sprite, sprite_bit9_adr, end2)
 	
 	// if fire > 2 ok
-	lda #2
-	cmp fire_x_adr
-	bcc end2
+	jmpgt(fire_x_adr, 2, end2)
 
 	// hide fire, because it just pass throught the right of the screen
 	clearbit(fire_sprite, sprite_enable_adr)
